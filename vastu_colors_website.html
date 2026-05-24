@@ -1,0 +1,701 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); }
+
+  .hero {
+    background: linear-gradient(135deg, #1a0533 0%, #0d1f3c 40%, #0a2e1a 100%);
+    padding: 72px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-orbs {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+  .orb {
+    position: absolute; border-radius: 50%; opacity: 0.18;
+    filter: blur(60px);
+  }
+  .orb1 { width: 280px; height: 280px; background: #c084fc; top: -60px; left: -60px; }
+  .orb2 { width: 220px; height: 220px; background: #38bdf8; top: 20px; right: -40px; }
+  .orb3 { width: 200px; height: 200px; background: #4ade80; bottom: -40px; left: 30%; }
+  .orb4 { width: 180px; height: 180px; background: #fb923c; bottom: 0; right: 10%; }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.08);
+    border: 0.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.75);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 42px; font-weight: 500;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: #c084fc; }
+  .hero-sub {
+    font-size: 16px; color: rgba(255,255,255,0.6);
+    max-width: 520px; margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+  .hero-spectrum {
+    display: flex; justify-content: center; gap: 6px;
+    margin-bottom: 36px;
+  }
+  .spec-bar {
+    height: 5px; border-radius: 3px; flex: 1; max-width: 70px;
+    opacity: 0.85;
+  }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 48px;
+  }
+  .h-stat { text-align: center; }
+  .h-stat-num { font-size: 28px; font-weight: 500; color: #fff; }
+  .h-stat-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+  .nav-pills {
+    display: flex; gap: 8px; padding: 20px 40px;
+    overflow-x: auto;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .nav-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 0.5px solid var(--color-border-secondary);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    background: transparent;
+    color: var(--color-text-secondary);
+    transition: all 0.2s;
+  }
+  .nav-pill:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .nav-pill.active { color: #fff; border-color: transparent; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .section { padding: 48px 40px; }
+  .section-head { margin-bottom: 32px; }
+  .section-eyebrow {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--color-text-tertiary); margin-bottom: 8px;
+  }
+  .section-title { font-size: 26px; font-weight: 500; margin-bottom: 8px; }
+  .section-sub { font-size: 15px; color: var(--color-text-secondary); line-height: 1.6; max-width: 560px; }
+
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .color-card {
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .color-card:hover { transform: translateY(-3px); }
+  .cc-swatch {
+    height: 100px;
+    display: flex; align-items: flex-end;
+    padding: 12px;
+  }
+  .cc-nm {
+    font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+    background: rgba(0,0,0,0.25);
+    color: #fff;
+    padding: 3px 10px; border-radius: 10px;
+    display: inline-block;
+  }
+  .cc-body { padding: 14px; }
+  .cc-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .cc-zone { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
+  .cc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag {
+    font-size: 11px; padding: 2px 8px;
+    border-radius: 8px;
+    border: 0.5px solid var(--color-border-tertiary);
+    color: var(--color-text-secondary);
+  }
+  .cc-wave {
+    font-size: 11px; color: var(--color-text-tertiary);
+    margin-top: 10px; display: flex; align-items: center; gap: 4px;
+  }
+
+  .direction-compass {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+    max-width: 540px; margin: 0 auto;
+  }
+  .dir-cell {
+    border-radius: var(--border-radius-md);
+    padding: 14px;
+    border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+    text-align: center;
+  }
+  .dir-cell.center-cell {
+    background: var(--color-background-secondary);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .dir-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+  .dir-color { width: 32px; height: 32px; border-radius: 50%; margin: 0 auto 8px; }
+  .dir-name { font-size: 12px; font-weight: 500; }
+  .dir-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .compass-rose { font-size: 28px; margin-bottom: 4px; }
+
+  .science-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;
+  }
+  .sci-card {
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+  }
+  .sci-icon {
+    width: 40px; height: 40px; border-radius: var(--border-radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 14px;
+    border: 0.5px solid var(--color-border-tertiary);
+  }
+  .sci-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .sci-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+  .room-table { width: 100%; border-collapse: collapse; }
+  .room-table th {
+    text-align: left; font-size: 11px; font-weight: 500; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--color-text-tertiary);
+    padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .room-table td {
+    padding: 13px 12px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    font-size: 13px; vertical-align: middle;
+  }
+  .room-table tr:last-child td { border-bottom: none; }
+  .room-table tr:hover td { background: var(--color-background-secondary); }
+  .color-swatch-sm {
+    display: flex; gap: 4px;
+  }
+  .sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+  .wave-bar-wrap { margin-top: 32px; }
+  .wave-item { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .wave-label { font-size: 13px; font-weight: 500; min-width: 60px; }
+  .wave-track { flex: 1; height: 8px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .wave-fill { height: 100%; border-radius: 4px; }
+  .wave-nm { font-size: 12px; color: var(--color-text-tertiary); min-width: 60px; text-align: right; }
+
+  .verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .verdict-card {
+    padding: 18px;
+    border-radius: var(--border-radius-lg);
+    border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+  }
+  .verdict-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .verdict-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .verdict-title { font-size: 14px; font-weight: 500; }
+  .verdict-item { font-size: 12px; color: var(--color-text-secondary); padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); line-height: 1.5; }
+  .verdict-item:last-child { border-bottom: none; }
+
+  .footer {
+    background: var(--color-background-secondary);
+    border-top: 0.5px solid var(--color-border-tertiary);
+    padding: 32px 40px;
+    text-align: center;
+  }
+  .footer-logo { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+  .footer-logo span { color: #c084fc; }
+  .footer-sub { font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 20px; }
+  .footer-links { display: flex; justify-content: center; gap: 24px; }
+  .footer-link { font-size: 13px; color: var(--color-text-secondary); cursor: pointer; }
+  .footer-link:hover { color: var(--color-text-primary); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .detail-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .detail-overlay.open { display: flex; }
+  .detail-box {
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    width: 480px; max-width: 90vw;
+    padding: 0; overflow: hidden;
+    border: 0.5px solid var(--color-border-secondary);
+  }
+  .detail-header { height: 140px; display: flex; align-items: flex-end; padding: 20px; }
+  .detail-close {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(0,0,0,0.3); color: #fff;
+    border: none; border-radius: 50%; width: 28px; height: 28px;
+    cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .detail-body { padding: 24px; }
+  .detail-title { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+  .detail-wave { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 16px; }
+  .detail-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
+  .detail-row-label { font-size: 12px; color: var(--color-text-tertiary); min-width: 100px; padding-top: 1px; }
+  .detail-row-val { font-size: 13px; color: var(--color-text-primary); flex: 1; line-height: 1.5; }
+  .evidence-badge {
+    display: inline-block;
+    font-size: 11px; padding: 2px 10px;
+    border-radius: 10px; font-weight: 500;
+  }
+  .ev-strong { background: #d1fae5; color: #065f46; }
+  .ev-moderate { background: #fef3c7; color: #92400e; }
+  .ev-traditional { background: #ede9fe; color: #5b21b6; }
+
+  @media (prefers-color-scheme: dark) {
+    .hero { background: linear-gradient(135deg, #0d0018 0%, #040f1e 40%, #04160d 100%); }
+    .ev-strong { background: #064e3b; color: #6ee7b7; }
+    .ev-moderate { background: #78350f; color: #fcd34d; }
+    .ev-traditional { background: #3b0764; color: #c4b5fd; }
+  }
+</style>
+
+<h2 class="sr-only">Scientific Vastu for Colors — An interactive guide to the science and tradition of Vastu color theory, including direction mapping, chromotherapy, and room-wise recommendations.</h2>
+
+<div class="hero">
+  <div class="hero-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="orb orb4"></div>
+  </div>
+  <div style="position:relative; z-index:1;">
+    <div class="hero-badge">Ancient wisdom · Modern science</div>
+    <h1>Scientific <span>Vastu</span><br>for Colors</h1>
+    <p class="hero-sub">Where 5,000-year-old directional color wisdom meets modern neuroscience, chromotherapy, and environmental psychology.</p>
+    <div class="hero-spectrum">
+      <div class="spec-bar" style="background:#ef4444;"></div>
+      <div class="spec-bar" style="background:#f97316;"></div>
+      <div class="spec-bar" style="background:#eab308;"></div>
+      <div class="spec-bar" style="background:#22c55e;"></div>
+      <div class="spec-bar" style="background:#3b82f6;"></div>
+      <div class="spec-bar" style="background:#6366f1;"></div>
+      <div class="spec-bar" style="background:#a855f7;"></div>
+    </div>
+    <div class="hero-stats">
+      <div class="h-stat"><div class="h-stat-num">7</div><div class="h-stat-label">Color frequencies</div></div>
+      <div class="h-stat"><div class="h-stat-num">8</div><div class="h-stat-label">Vastu directions</div></div>
+      <div class="h-stat"><div class="h-stat-num">5,000+</div><div class="h-stat-label">Years of tradition</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-pills">
+  <button class="nav-pill active" style="background:#6366f1; border-color:#6366f1;" onclick="showTab('colors', this)">
+    <span class="dot" style="background:#fff;"></span> Color guide
+  </button>
+  <button class="nav-pill" onclick="showTab('directions', this)">
+    <span class="dot" style="background:#f97316;"></span> Direction map
+  </button>
+  <button class="nav-pill" onclick="showTab('rooms', this)">
+    <span class="dot" style="background:#22c55e;"></span> Room guide
+  </button>
+  <button class="nav-pill" onclick="showTab('science', this)">
+    <span class="dot" style="background:#3b82f6;"></span> The science
+  </button>
+  <button class="nav-pill" onclick="showTab('verdict', this)">
+    <span class="dot" style="background:#a855f7;"></span> Evidence verdict
+  </button>
+</div>
+
+<div id="tab-colors" class="tab-content active section">
+  <div class="section-head">
+    <div class="section-eyebrow">Chromatic spectrum</div>
+    <div class="section-title">Each color, decoded</div>
+    <div class="section-sub">Click any color card to explore its wavelength, Vastu zone, scientific effects, and room applications.</div>
+  </div>
+  <div class="color-grid" id="color-grid"></div>
+</div>
+
+<div id="tab-directions" class="tab-content section">
+  <div class="section-head">
+    <div class="section-eyebrow">Directional mapping</div>
+    <div class="section-title">Colors by compass direction</div>
+    <div class="section-sub">Vastu assigns colors to directions based on solar movement, magnetic fields, and elemental energy. Each direction governs a life domain.</div>
+  </div>
+  <div class="direction-compass" id="compass-grid"></div>
+  <div style="margin-top:32px;">
+    <div class="section-eyebrow" style="margin-bottom:16px;">Wavelength spectrum — energy intensity by color</div>
+    <div class="wave-bar-wrap" id="wave-bars"></div>
+  </div>
+</div>
+
+<div id="tab-rooms" class="tab-content section">
+  <div class="section-head">
+    <div class="section-eyebrow">Room-wise guide</div>
+    <div class="section-title">Right color, right room</div>
+    <div class="section-sub">Vastu room color recommendations backed by environmental psychology and neurological research.</div>
+  </div>
+  <div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); overflow:hidden;">
+    <table class="room-table" id="room-table"></table>
+  </div>
+</div>
+
+<div id="tab-science" class="tab-content section">
+  <div class="section-head">
+    <div class="section-eyebrow">Neuroscience & physics</div>
+    <div class="section-title">How color enters the brain</div>
+    <div class="section-sub">Color is electromagnetic energy. The pathway from retina to hypothalamus is the mechanism that makes Vastu color theory physiologically real.</div>
+  </div>
+  <div class="science-grid" id="science-grid"></div>
+</div>
+
+<div id="tab-verdict" class="tab-content section">
+  <div class="section-head">
+    <div class="section-eyebrow">Evidence review</div>
+    <div class="section-title">What science confirms vs. tradition holds</div>
+    <div class="section-sub">An honest look at where Vastu color theory has strong empirical backing and where it remains in the domain of tradition.</div>
+  </div>
+  <div class="verdict-grid" id="verdict-grid"></div>
+</div>
+
+<div class="footer">
+  <div class="footer-logo">Vastu <span>×</span> Science</div>
+  <div class="footer-sub">Bridging ancient architectural wisdom with modern chromotherapy research</div>
+  <div class="footer-links">
+    <span class="footer-link" onclick="sendPrompt('Tell me more about chromotherapy and its medical applications')">Chromotherapy research ↗</span>
+    <span class="footer-link" onclick="sendPrompt('What are anti-colors in Vastu and what rooms should they be avoided in?')">Anti-color guide ↗</span>
+    <span class="footer-link" onclick="sendPrompt('How does the hypothalamus respond to different light wavelengths?')">Neuroscience deep dive ↗</span>
+  </div>
+</div>
+
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail(event)">
+  <div class="detail-box" style="position:relative;">
+    <button class="detail-close" onclick="document.getElementById('detail-overlay').classList.remove('open')">×</button>
+    <div class="detail-header" id="detail-header">
+      <span style="font-size:22px; font-weight:500; color:#fff;" id="detail-hname"></span>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+const colors = [
+  {
+    name: "Red", hex: "#ef4444", nm: "620–750 nm", freq: "400–484 THz",
+    zone: "South · South-East",
+    element: "Fire · Mars",
+    tags: ["Energy", "Courage", "Warmth"],
+    science: "Longest wavelength — requires most visual adjustment, appears nearest to viewer. Raises heart rate and blood pressure. Stimulates ATP production in cells.",
+    vastu: "Use in kitchens, gyms, south-facing walls. Promotes vitality and courage.",
+    avoid: "Bedrooms, study rooms, meditation spaces.",
+    evidence: "strong",
+    waveRatio: 0.95
+  },
+  {
+    name: "Orange", hex: "#f97316", nm: "590–620 nm", freq: "484–508 THz",
+    zone: "South-East · Dining",
+    element: "Fire · Venus",
+    tags: ["Creativity", "Appetite", "Social"],
+    science: "Stimulates sacral energy center. Promotes enthusiasm and social interaction. Proven to stimulate appetite and digestive system.",
+    vastu: "Ideal for dining areas, creative studios, living rooms.",
+    avoid: "Bedrooms, study rooms requiring deep focus.",
+    evidence: "moderate",
+    waveRatio: 0.82
+  },
+  {
+    name: "Yellow", hex: "#eab308", nm: "570–590 nm", freq: "508–526 THz",
+    zone: "East · North-East · Study",
+    element: "Air · Sun",
+    tags: ["Intellect", "Clarity", "Learning"],
+    science: "Activates left hemisphere (logic, analysis). Research confirms yellow environments improve learning speed and memory encoding.",
+    vastu: "Best for study rooms, kitchens, east-facing walls. Promotes intelligence.",
+    avoid: "Nurseries for newborns — can cause overstimulation.",
+    evidence: "strong",
+    waveRatio: 0.72
+  },
+  {
+    name: "Green", hex: "#22c55e", nm: "495–570 nm", freq: "526–606 THz",
+    zone: "North · East · Living room",
+    element: "Water · Mercury",
+    tags: ["Healing", "Balance", "Social"],
+    science: "Most restful wavelength — requires zero eye adjustment. Reduces amygdala activity, lowers cortisol. Analgesic properties shown in migraine studies.",
+    vastu: "Excellent for bedrooms, gardens, healing spaces, east walls.",
+    avoid: "Spaces that need high energy and motivation.",
+    evidence: "strong",
+    waveRatio: 0.60
+  },
+  {
+    name: "Blue", hex: "#3b82f6", nm: "450–495 nm", freq: "606–668 THz",
+    zone: "North · West · Study",
+    element: "Water · Saturn",
+    tags: ["Focus", "Calm", "Clarity"],
+    science: "Blue-enriched light increases alertness, performance, and concentration. Regulates circadian rhythm via suprachiasmatic nucleus. FDA-recognized therapy for jaundice.",
+    vastu: "Best for study rooms, meditation spaces, west-facing rooms.",
+    avoid: "Kitchens — suppresses appetite.",
+    evidence: "strong",
+    waveRatio: 0.48
+  },
+  {
+    name: "Violet", hex: "#a855f7", nm: "380–450 nm", freq: "668–789 THz",
+    zone: "North-West · Meditation",
+    element: "Space · Moon",
+    tags: ["Introspection", "Creativity", "Spirit"],
+    science: "Shortest visible wavelength — highest energy. Stimulates pineal gland (melatonin/serotonin regulation). Used in neurological chromotherapy.",
+    vastu: "Ideal for meditation rooms, creative studios, north-west corners.",
+    avoid: "Children's study rooms — can be overstimulating.",
+    evidence: "moderate",
+    waveRatio: 0.35
+  },
+  {
+    name: "White", hex: "#d4d4d4", nm: "Full spectrum", freq: "All reflected",
+    zone: "North-East · Pooja · Entry",
+    element: "Space · Purity",
+    tags: ["Purity", "Expansion", "Clarity"],
+    science: "Reflects all wavelengths — maximizes perceived space. Hospital research shows white/neutral environments reduce patient anxiety. Boosts light in dim spaces.",
+    vastu: "Best for entrances, prayer rooms, north-east, bathrooms.",
+    avoid: "Spaces requiring warmth and intimacy.",
+    evidence: "moderate",
+    waveRatio: 1.0
+  },
+  {
+    name: "Brown", hex: "#92400e", nm: "600–650 nm", freq: "Mixed earth",
+    zone: "South-West · Master bedroom",
+    element: "Earth",
+    tags: ["Stability", "Grounding", "Trust"],
+    science: "Earth tones activate biophilic neural responses — familiarity and safety. Proven to reduce anxiety and promote feelings of security and trust.",
+    vastu: "Bedrooms, south-west walls — governs relationships and stability.",
+    avoid: "Living rooms and social spaces — can dampen energy.",
+    evidence: "moderate",
+    waveRatio: 0.78
+  }
+];
+
+const directions = [
+  { pos: "NW", label: "North-West", hex: "#94a3b8", colorName: "Silver/Grey", domain: "Air · Moon", life: "Travel & health" },
+  { pos: "N", label: "North", hex: "#93c5fd", colorName: "Pale blue", domain: "Water · Mercury", life: "Wealth & career" },
+  { pos: "NE", label: "North-East", hex: "#bfdbfe", colorName: "Light blue", domain: "Water · Jupiter", life: "Clarity of mind" },
+  { pos: "W", label: "West", hex: "#6366f1", colorName: "Blue/Grey", domain: "Saturn", life: "Profits & gains" },
+  { pos: "C", label: "Centre", hex: "", colorName: "", domain: "", life: "Brahm Sthaan" },
+  { pos: "E", label: "East", hex: "#fde68a", colorName: "Yellow/Green", domain: "Sun", life: "Social & health" },
+  { pos: "SW", label: "South-West", hex: "#92400e", colorName: "Brown/Earthy", domain: "Earth · Rahu", life: "Relationships" },
+  { pos: "S", label: "South", hex: "#f87171", colorName: "Red/Orange", domain: "Fire · Mars", life: "Fame & relaxation" },
+  { pos: "SE", label: "South-East", hex: "#fb923c", colorName: "Orange/Pink", domain: "Fire · Venus", life: "Energy & cash" }
+];
+
+const rooms = [
+  { room: "Bedroom", icon: "ti-moon", colors: ["#93c5fd","#86efac","#c4b5fd"], names: "Light blue, green, lavender", science: "Lowers cortisol, promotes melatonin secretion, relaxes CNS", avoid: "Red, dark orange" },
+  { room: "Kitchen", icon: "ti-chef-hat", colors: ["#fde68a","#fb923c","#f87171"], names: "Yellow, orange, red", science: "Stimulates digestion, appetite, and alertness in food prep", avoid: "Blue, dark grey" },
+  { room: "Study / Office", icon: "ti-book", colors: ["#93c5fd","#86efac","#fde68a"], names: "Blue, green, yellow", science: "Improves focus, memory retention, and cognitive processing", avoid: "Red, black" },
+  { room: "Living Room", icon: "ti-sofa", colors: ["#e5e5e5","#bbf7d0","#fef9c3"], names: "Beige, light green, off-white", science: "Promotes social harmony, relaxed conversation, reduces stress", avoid: "Harsh reds, heavy darks" },
+  { room: "Meditation Room", icon: "ti-heart", colors: ["#c4b5fd","#6366f1","#f0f0f0"], names: "Violet, indigo, white", science: "Stimulates pineal gland, deepens introspection, calms amygdala", avoid: "Red, bright yellow" },
+  { room: "Children's Room", icon: "ti-star", colors: ["#fde68a","#86efac","#bae6fd"], names: "Yellow, light green, sky blue", science: "Stimulates brain development, creativity, and learning pathways", avoid: "Black, heavy browns" },
+  { room: "Pooja Room", icon: "ti-flame", colors: ["#fde68a","#f0f0f0","#fbbf24"], names: "Yellow, white, gold", science: "Elevates mood through dopamine response, stimulates reverence", avoid: "Black, dark red" },
+  { room: "Bathroom", icon: "ti-droplet", colors: ["#f0f0f0","#93c5fd","#a7f3d0"], names: "White, light blue, aqua", science: "Promotes cleanliness perception, calms the nervous system", avoid: "Red, dark orange" }
+];
+
+const sciCards = [
+  { icon: "ti-eye", iconBg: "#ede9fe", title: "Retina → hypothalamus pathway", desc: "Light wavelengths convert to electrical impulses in the retina, travel to the hypothalamus which governs all endocrine hormone production — directly linking color to physiology." },
+  { icon: "ti-brain", iconBg: "#dbeafe", title: "Amygdala modulation", desc: "Blue and green wavelengths (490–520 nm) directly reduce amygdala activity, measurably lowering anxiety and stress — confirmed via fMRI studies." },
+  { icon: "ti-heart-rate-monitor", iconBg: "#fee2e2", title: "Pulse & heart rate effect", desc: "Blindfolded subjects show measurable pulse increases under red light and decreases under blue — proving the effect is biological, not just psychological." },
+  { icon: "ti-moon", iconBg: "#f0fdf4", title: "Circadian rhythm control", desc: "Blue light exposure suppresses melatonin via the suprachiasmatic nucleus. This is the basis of both light therapy and the Vastu recommendation for calm blue in western rooms." },
+  { icon: "ti-dna", iconBg: "#fef9c3", title: "Hormonal cascade", desc: "The hypothalamus governs cortisol, melatonin, serotonin, and dopamine. Each wavelength triggers a different hormonal balance — the physical mechanism behind color's emotional effects." },
+  { icon: "ti-sun", iconBg: "#fce7f3", title: "Solar direction logic", desc: "Vastu's direction-color mapping aligns with solar movement: east (morning sun) = stimulating yellow; south (midday fire) = energizing red; north = calming blue for lower sun exposure." }
+];
+
+const verdicts = [
+  {
+    status: "strong", label: "Strongly supported by science",
+    color: "#22c55e",
+    items: [
+      "Colors affect mood via the retina → hypothalamus pathway",
+      "Warm colors raise pulse and physiological arousal",
+      "Blue light regulates circadian rhythm (FDA-recognized therapy)",
+      "Green is measurably the most restful color for human eyes",
+      "Color affects hormone production and endocrine function",
+      "Direction-based solar logic (east = morning light = stimulation)"
+    ]
+  },
+  {
+    status: "moderate", label: "Partially or moderately supported",
+    color: "#f97316",
+    items: [
+      "Orange stimulates appetite (some RCT evidence exists)",
+      "Yellow improves learning (mixed study quality)",
+      "Brown/earth tones reduce anxiety (biophilic design research)",
+      "Violet stimulates the pineal gland (preliminary findings)",
+      "White maximizes perceived space (environmental psychology)"
+    ]
+  },
+  {
+    status: "traditional", label: "Traditional — limited clinical evidence",
+    color: "#a855f7",
+    items: [
+      "Planetary color assignments to directions",
+      "Colors healing specific organ systems directly",
+      "Anti-color theory creating exact Vastu defects",
+      "Color curing structural Vastu flaws"
+    ]
+  },
+  {
+    status: "caution", label: "Needs critical caution",
+    color: "#ef4444",
+    items: [
+      "No proven 1-to-1 color-to-disease relationship (per systematic review)",
+      "Cultural conditioning strongly shapes color emotion response",
+      "Individual variation means no universal room color rule",
+      "Chromotherapy alone cannot treat clinical conditions"
+    ]
+  }
+];
+
+function buildColorGrid() {
+  const grid = document.getElementById('color-grid');
+  grid.innerHTML = colors.map((c,i) => `
+    <div class="color-card" onclick="openDetail(${i})">
+      <div class="cc-swatch" style="background:${c.hex};">
+        <span class="cc-nm">${c.nm}</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-title">${c.name}</div>
+        <div class="cc-zone"><i class="ti ti-compass" aria-hidden="true" style="font-size:12px;"></i> ${c.zone}</div>
+        <div class="cc-tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="cc-wave"><i class="ti ti-wave-sine" aria-hidden="true"></i> ${c.freq}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDetail(i) {
+  const c = colors[i];
+  document.getElementById('detail-header').style.background = c.hex;
+  document.getElementById('detail-hname').textContent = c.name;
+  const evClass = c.evidence === 'strong' ? 'ev-strong' : c.evidence === 'moderate' ? 'ev-moderate' : 'ev-traditional';
+  const evText = c.evidence === 'strong' ? 'Strongly supported' : c.evidence === 'moderate' ? 'Moderate evidence' : 'Traditional';
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-title">${c.name}</div>
+    <div class="detail-wave">${c.nm} · ${c.freq}</div>
+    <div class="detail-row"><span class="detail-row-label">Vastu zone</span><span class="detail-row-val">${c.zone}</span></div>
+    <div class="detail-row"><span class="detail-row-label">Element</span><span class="detail-row-val">${c.element}</span></div>
+    <div class="detail-row"><span class="detail-row-label">Science</span><span class="detail-row-val">${c.science}</span></div>
+    <div class="detail-row"><span class="detail-row-label">Use in</span><span class="detail-row-val">${c.vastu}</span></div>
+    <div class="detail-row"><span class="detail-row-label">Avoid in</span><span class="detail-row-val" style="color:var(--color-text-danger, #ef4444);">${c.avoid}</span></div>
+    <div class="detail-row"><span class="detail-row-label">Evidence</span><span class="detail-row-val"><span class="evidence-badge ${evClass}">${evText}</span></span></div>
+    <button style="margin-top:16px; width:100%;" onclick="sendPrompt('Tell me more about ${c.name} color in Vastu and its scientific effects in detail')">Explore deeper research ↗</button>
+  `;
+  document.getElementById('detail-overlay').classList.add('open');
+}
+
+function closeDetail(e) {
+  if (e.target === document.getElementById('detail-overlay')) {
+    document.getElementById('detail-overlay').classList.remove('open');
+  }
+}
+
+function buildCompass() {
+  const grid = document.getElementById('compass-grid');
+  grid.innerHTML = directions.map(d => {
+    if (d.pos === 'C') return `<div class="dir-cell center-cell"><div class="compass-rose">🧭</div><div style="font-size:12px; font-weight:500;">Brahm Sthaan</div><div style="font-size:11px; color:var(--color-text-tertiary); margin-top:2px;">Centre</div></div>`;
+    return `<div class="dir-cell">
+      <div class="dir-label">${d.pos}</div>
+      <div class="dir-color" style="background:${d.hex}; border: 0.5px solid var(--color-border-tertiary);"></div>
+      <div class="dir-name">${d.colorName}</div>
+      <div class="dir-sub">${d.life}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildWaveBars() {
+  const container = document.getElementById('wave-bars');
+  const waveColors = [
+    { name: "Red", hex: "#ef4444", ratio: 0.95, nm: "620–750 nm" },
+    { name: "Orange", hex: "#f97316", ratio: 0.82, nm: "590–620 nm" },
+    { name: "Yellow", hex: "#eab308", ratio: 0.72, nm: "570–590 nm" },
+    { name: "Green", hex: "#22c55e", ratio: 0.60, nm: "495–570 nm" },
+    { name: "Blue", hex: "#3b82f6", ratio: 0.48, nm: "450–495 nm" },
+    { name: "Violet", hex: "#a855f7", ratio: 0.35, nm: "380–450 nm" }
+  ];
+  container.innerHTML = waveColors.map(w => `
+    <div class="wave-item">
+      <span class="wave-label" style="color:${w.hex};">${w.name}</span>
+      <div class="wave-track">
+        <div class="wave-fill" style="width:${Math.round(w.ratio*100)}%; background:${w.hex};"></div>
+      </div>
+      <span class="wave-nm">${w.nm}</span>
+    </div>
+  `).join('');
+}
+
+function buildRoomTable() {
+  const t = document.getElementById('room-table');
+  t.innerHTML = `<thead><tr>
+    <th>Room</th><th>Vastu colors</th><th>Scientific basis</th><th>Avoid</th>
+  </tr></thead><tbody>` + rooms.map(r => `<tr>
+    <td><i class="ti ${r.icon}" aria-hidden="true" style="margin-right:6px; color:var(--color-text-secondary);"></i><strong style="font-weight:500;">${r.room}</strong></td>
+    <td>
+      <div class="color-swatch-sm" style="margin-bottom:4px;">${r.colors.map(c=>`<span class="sw" style="background:${c};"></span>`).join('')}</div>
+      <span style="font-size:12px; color:var(--color-text-secondary);">${r.names}</span>
+    </td>
+    <td style="color:var(--color-text-secondary);">${r.science}</td>
+    <td style="color:var(--color-text-secondary); font-size:12px;">${r.avoid}</td>
+  </tr>`).join('') + '</tbody>';
+}
+
+function buildScienceGrid() {
+  const g = document.getElementById('science-grid');
+  g.innerHTML = sciCards.map(s => `
+    <div class="sci-card">
+      <div class="sci-icon" style="background:${s.iconBg};">
+        <i class="ti ${s.icon}" aria-hidden="true"></i>
+      </div>
+      <div class="sci-title">${s.title}</div>
+      <div class="sci-desc">${s.desc}</div>
+    </div>
+  `).join('');
+}
+
+function buildVerdictGrid() {
+  const g = document.getElementById('verdict-grid');
+  g.innerHTML = verdicts.map(v => `
+    <div class="verdict-card">
+      <div class="verdict-head">
+        <div class="verdict-dot" style="background:${v.color};"></div>
+        <div class="verdict-title">${v.label}</div>
+      </div>
+      ${v.items.map(item => `<div class="verdict-item">${item}</div>`).join('')}
+    </div>
+  `).join('');
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.nav-pill').forEach(p => {
+    p.classList.remove('active');
+    p.style.background = '';
+    p.style.borderColor = '';
+    p.style.color = '';
+  });
+  btn.classList.add('active');
+  btn.style.background = '#6366f1';
+  btn.style.borderColor = '#6366f1';
+  btn.style.color = '#fff';
+}
+
+buildColorGrid();
+buildCompass();
+buildWaveBars();
+buildRoomTable();
+buildScienceGrid();
+buildVerdictGrid();
+</script>
